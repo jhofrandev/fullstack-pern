@@ -31,7 +31,7 @@ export const createProduct = async (req: Request, res: Response) => {
   try {
     console.log("dlskldkslkdk");
     const product = await Product.create(req.body);
-    res.json({ data: product });
+    res.status(201).json({ data: product });
   } catch (error) {
     console.log(error);
   }
@@ -49,7 +49,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     await product.update(req.body);
     await product.save();
 
-    res.json({ data: product });
+    res.status(201).json({ data: product });
   } catch (error) {
     console.log(error);
   }
