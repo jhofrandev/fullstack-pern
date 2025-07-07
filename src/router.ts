@@ -1,27 +1,72 @@
 import { Router } from "express";
-import { createProduct } from "./handlers/product";
+import { body, param } from "express-validator";
+import {
+  createProduct,
+  deleteProduct,
+  getProductById,
+  getProducts,
+  updateAvailability,
+  updateProduct,
+} from "./handlers/product";
+import { handleInputErrors } from "./middleware";
+import { asyncHandler } from "./middleware/asyncHandler";
 
 const router = Router();
 
 // Routing
-router.get("/", (req, res) => {
-  res.send("Welcome to the REST API!");
-});
+router.get("/", getProducts);
 
-router.post("/", (req, res, next) => {
-  Promise.resolve(createProduct(req, res)).catch(next);
-});
+router.get(
+  "/:id",
+  param("id").isInt().withMessage("Invalid ID"),
+  handleInputErrors,
+  asyncHandler(getProductById)
+);
 
-router.put("/", (req, res) => {
-  res.send("PUT request received!");
-});
+router.post(
+  "/",
+  body("name").notEmpty().withMessage("Name is required"),
+  body("price")
+    .isNumeric()
+    .withMessage("Invalid value")
+    .notEmpty()
+    .withMessage("Price is required")
+    .custom((value) => value > 0)
+    .withMessage("Price must be greater than 0"),
+  handleInputErrors,
+  createProduct
+);
 
-router.patch("/", (req, res) => {
-  res.send("PATCH request received!");
-});
+router.put(
+  "/:id",
+  param("id").isInt().withMessage("Invalid ID"),
+  body("name").notEmpty().withMessage("Name is required"),
+  body("price")
+    .isNumeric()
+    .withMessage("Invalid value")
+    .notEmpty()
+    .withMessage("Price is required")
+    .custom((value) => value > 0)
+    .withMessage("Price must be greater than 0"),
+  body("availability")
+    .isBoolean()
+    .withMessage("Availability must be a boolean"),
+  handleInputErrors,
+  asyncHandler(updateProduct)
+);
 
-router.delete("/", (req, res) => {
-  res.send("DELETE request received!");
-});
+router.patch(
+  "/:id",
+  param("id").isInt().withMessage("Invalid ID"),
+  handleInputErrors,
+  asyncHandler(updateAvailability)
+);
+
+router.delete(
+  "/:id",
+  param("id").isInt().withMessage("Invalid ID"),
+  handleInputErrors,
+  asyncHandler(deleteProduct)
+);
 
 export default router;
