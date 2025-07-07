@@ -7,3 +7,5 @@ server.listen(port, () => {
     colors.cyan.bold(`REST API is running on http://localhost:${port}`)
   );
 });
+
+// add this
