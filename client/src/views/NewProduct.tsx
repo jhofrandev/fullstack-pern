@@ -1,7 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Link, Form, useActionData } from "react-router-dom";
+import {
+  Link,
+  Form,
+  useActionData,
+  type ActionFunctionArgs,
+  redirect,
+} from "react-router-dom";
+import ErrorMessage from "../components/ErrorMessage";
+import { addProduct } from "../services/ProductService";
 
-export async function action({ request }) {
+export async function action({ request }: ActionFunctionArgs) {
   const data = Object.fromEntries(await request.formData());
 
   let error = "";
@@ -12,13 +20,13 @@ export async function action({ request }) {
     return error;
   }
 
-  return {};
+  await addProduct(data);
+
+  return redirect("/");
 }
 
 export default function NewProduct() {
-  const error = useActionData();
-
-  console.log(error);
+  const error = useActionData() as string;
 
   return (
     <>
@@ -33,6 +41,8 @@ export default function NewProduct() {
           Volver a Productos
         </Link>
       </div>
+
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <Form className="mt-10" method="POST">
         <div className="mb-4">
